@@ -19,6 +19,9 @@ mvn clean package
 ```
 
 ### Запуск
+```bash
 java -Xmx1G -jar Solution-1.0.jar /путь/к/lng-4.txt.gz
+```
+
 
 Результат будет записан в файл out.txt в рабочей директории.
