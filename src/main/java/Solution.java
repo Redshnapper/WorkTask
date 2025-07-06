@@ -2,6 +2,7 @@ import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
 import java.io.*;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -22,13 +23,17 @@ public class Solution {
         List<Map<String, List<Integer>>> columnMaps = new ArrayList<>();
         for (int i = 0; i < MAX_COLUMNS; i++) columnMaps.add(new HashMap<>());
 
-        try (SevenZFile sevenZFile = new SevenZFile(file)) {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r");
+             SeekableByteChannel channel = raf.getChannel();
+             SevenZFile sevenZFile = SevenZFile.builder().
+                     setSeekableByteChannel(channel).
+                     get()) {
+
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".csv")) {
                     InputStream entryStream = new SevenZFileInputStream(sevenZFile);
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(entryStream, StandardCharsets.UTF_8))) {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(entryStream, StandardCharsets.UTF_8))) {
 
                         String line;
                         while ((line = reader.readLine()) != null) {
@@ -62,13 +67,17 @@ public class Solution {
         Map<Integer, List<String>> groupMap = new HashMap<>();
         int currentLine = 0;
 
-        try (SevenZFile sevenZFile = new SevenZFile(file)) {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r");
+             SeekableByteChannel channel = raf.getChannel();
+             SevenZFile sevenZFile = SevenZFile.builder().
+                     setSeekableByteChannel(channel).
+                     get()) {
+
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".csv")) {
                     InputStream entryStream = new SevenZFileInputStream(sevenZFile);
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(entryStream, StandardCharsets.UTF_8))) {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(entryStream, StandardCharsets.UTF_8))) {
 
                         String line;
                         while ((line = reader.readLine()) != null) {
